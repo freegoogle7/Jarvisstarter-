@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#080d18">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JARVIS">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-180.png">
+  <title>JARVIS</title>
+  <style>
+    :root { color-scheme: dark; --bg:#080d18; --panel:#111b2b; --line:#26364c; --blue:#62c8ff; --muted:#9aabc0; }
+    * { box-sizing:border-box }
+    body { margin:0; min-height:100vh; background:radial-gradient(ellipse at 50% 0%,#172a40 0%,var(--bg) 55%); color:#edf6ff; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { width:min(100%,560px); margin:auto; min-height:100vh; padding: max(24px,env(safe-area-inset-top)) 20px max(24px,env(safe-area-inset-bottom)); display:flex; flex-direction:column; }
+    header { display:flex; justify-content:space-between; align-items:center; }
+    .brand { letter-spacing:.24em; font-weight:700; font-size:14px; color:#d8efff; }
+    .status { color:#8ee5b5; font-size:12px; letter-spacing:.08em; }
+    .hero { text-align:center; margin:54px 0 34px; }
+    .orb { width:156px; height:156px; margin:0 auto 24px; border-radius:50%; border:1px solid #4aaee8; background:radial-gradient(circle at 50% 45%,#224d70 0%,#12273d 42%,#0a1423 72%); box-shadow:0 0 25px #2c9bdb55, inset 0 0 30px #55bfff22; display:grid; place-items:center; position:relative; }
+    .orb:before,.orb:after { content:""; position:absolute; border:1px solid #59c7ff66; border-radius:50%; inset:10px; }
+    .orb:after { inset:-8px; border-color:#59c7ff33; }
+    .core { width:54px; height:54px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#d9f6ff,#55bfff 40%,#146a9f 75%); box-shadow:0 0 28px #4bbdff99; }
+    h1 { margin:0; font-size:28px; letter-spacing:.18em; font-weight:600; }
+    .sub { color:var(--muted); font-size:14px; margin-top:10px; }
+    .chat { flex:1; background:#0d1624b8; border:1px solid var(--line); border-radius:18px; padding:16px; min-height:180px; max-height:38vh; overflow:auto; }
+    .msg { padding:11px 13px; border-radius:14px; margin:8px 0; line-height:1.45; font-size:14px; white-space:pre-wrap; }
+    .jarvis { background:#15263a; border:1px solid #284663; margin-right:18px; }
+    .you { background:#173b56; border:1px solid #2b6487; margin-left:28px; }
+    .tag { color:var(--blue); font-size:10px; letter-spacing:.12em; margin-bottom:5px; }
+    .controls { margin-top:16px; }
+    .inputrow { display:flex; gap:8px; }
+    input { flex:1; min-width:0; border:1px solid var(--line); border-radius:13px; background:#111b2b; color:white; padding:14px; font-size:15px; outline:none; }
+    button { border:1px solid #3e789d; background:#14304a; color:#eaf8ff; border-radius:13px; padding:12px 15px; font-weight:600; }
+    button:active { transform:scale(.98); }
+    .actions { display:flex; gap:10px; margin-top:10px; }
+    .actions button { flex:1; }
+    .primary { background:linear-gradient(135deg,#1e75a5,#164a72); border-color:#65caff; }
+    .hint { color:#8297ad; font-size:11px; line-height:1.5; text-align:center; margin:14px 8px 0; }
+    .footer { text-align:center; color:#627991; font-size:10px; letter-spacing:.1em; margin-top:16px; }
+  </style>
+</head>
+<body>
+<main>
+  <header><div class="brand">JARVIS</div><div class="status">● READY</div></header>
+  <section class="hero">
+    <div class="orb" aria-hidden="true"><div class="core"></div></div>
+    <h1>JARVIS</h1>
+    <div class="sub">Your assistant. Your call.</div>
+  </section>
+  <section class="chat" id="chat" aria-live="polite">
+    <div class="msg jarvis"><div class="tag">JARVIS</div>I'm here. What are we looking at?</div>
+  </section>
+  <section class="controls">
+    <div class="inputrow">
+      <input id="message" placeholder="Ask me something..." autocomplete="off">
+      <button id="send">Send</button>
+    </div>
+    <div class="actions">
+      <button class="primary" id="speak">Speak response</button>
+      <button id="mic">Use microphone</button>
+    </div>
+    <div class="hint">Starter preview: voice output is enabled where your browser supports it. AI replies and screen analysis are not connected yet.</div>
+  </section>
+  <div class="footer">JARVIS • PRIVATE STARTER</div>
+</main>
+<script>
+const chat = document.getElementById('chat');
+const input = document.getElementById('message');
+let lastReply = "I'm here. What are we looking at?";
+function addMessage(text, who) {
+  const el = document.createElement('div');
+  el.className = 'msg ' + who;
+  if (who === 'jarvis') {
+    const tag = document.createElement('div'); tag.className='tag'; tag.textContent='JARVIS'; el.appendChild(tag);
+  } else {
+    const tag = document.createElement('div'); tag.className='tag'; tag.textContent='YOU'; el.appendChild(tag);
+  }
+  const body = document.createElement('div'); body.textContent=text; el.appendChild(body);
+  chat.appendChild(el); chat.scrollTop=chat.scrollHeight;
+}
+function replyTo(text) {
+  // Honest local placeholder until a no-cost AI provider is connected.
+  lastReply = "I got you. The chat screen is working, but my AI brain isn't connected yet. Next, we'll connect one of the free AI options and make sure it can't charge you.";
+  addMessage(lastReply,'jarvis');
+}
+function send() {
+  const text = input.value.trim(); if (!text) return;
+  addMessage(text,'you'); input.value=''; replyTo(text);
+}
+document.getElementById('send').addEventListener('click',send);
+input.addEventListener('keydown',e=>{if(e.key==='Enter') send();});
+document.getElementById('speak').addEventListener('click',()=>{
+  if (!('speechSynthesis' in window)) { addMessage("Voice playback isn't supported in this browser.",'jarvis'); return; }
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(lastReply);
+  utterance.lang='en-US'; utterance.rate=1.02; utterance.pitch=0.92;
+  window.speechSynthesis.speak(utterance);
+});
+document.getElementById('mic').addEventListener('click',()=>{
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { addMessage("Microphone dictation isn't supported in this browser. You can still type here.",'jarvis'); return; }
+  const recognition = new SR(); recognition.lang='en-US'; recognition.interimResults=false;
+  recognition.onresult = e => { input.value=e.results[0][0].transcript; send(); };
+  recognition.onerror = () => addMessage("I couldn't access speech input. Check your microphone permission, or type instead.",'jarvis');
+  recognition.start();
+});
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+</body>
+</html>
