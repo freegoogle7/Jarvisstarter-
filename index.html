@@ -81,10 +81,39 @@ function addMessage(text, who) {
   const body = document.createElement('div'); body.textContent=text; el.appendChild(body);
   chat.appendChild(el); chat.scrollTop=chat.scrollHeight;
 }
-function replyTo(text) {
-  // Honest local placeholder until a no-cost AI provider is connected.
-  lastReply = "I got you. The chat screen is working, but my AI brain isn't connected yet. Next, we'll connect one of the free AI options and make sure it can't charge you.";
-  addMessage(lastReply,'jarvis');
+async function replyTo(text) {
+  lastReply = "Thinking...";
+  addMessage(lastReply, "jarvis");
+
+  try {
+    const response = await fetch("http://localhost:11434/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "jarvis",
+        messages: [{ role: "user", content: text }],
+        think: false,
+        stream: false
+      })
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Ollama request failed");
+    }
+
+    lastReply = data.message.content;
+    chat.lastElementChild.querySelector("div:last-child").textContent = lastReply;
+
+  } catch (error) {
+    lastReply = "I couldn't connect to Ollama. Make sure Jarvis is running.";
+    chat.lastElementChild.querySelector("div:last-child").textContent = lastReply;
+    console.error(error);
+  }
+}
 }
 function send() {
   const text = input.value.trim(); if (!text) return;
